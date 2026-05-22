@@ -1,4 +1,4 @@
-const { add, subtract, multiply, divide } = require('../calculator');
+const { add, subtract, multiply, divide, modulo, power, squareRoot } = require('../calculator');
 
 /**
  * Comprehensive Unit Tests for Calculator Functions
@@ -180,6 +180,61 @@ describe('Calculator - Basic Arithmetic Operations', () => {
       expect(subtract(10, 4)).toBe(6);    // 10 - 4 = 6
       expect(multiply(45, 2)).toBe(90);   // 45 * 2 = 90
       expect(divide(20, 5)).toBe(4);      // 20 / 5 = 4
+    });
+  });
+
+  // ====== EXTENDED OPERATIONS TESTS ======
+  describe('Extended Operations (modulo, power, squareRoot)', () => {
+    describe('Modulo (mod)', () => {
+      it('should compute 5 % 2 = 1', () => {
+        expect(modulo(5, 2)).toBe(1);
+      });
+
+      it('should compute 10 % 3 = 1', () => {
+        expect(modulo(10, 3)).toBe(1);
+      });
+
+      it('should throw error on modulo by zero', () => {
+        expect(() => modulo(5, 0)).toThrow('Modulo by zero is not allowed');
+      });
+    });
+
+    describe('Power (pow)', () => {
+      it('should compute 2 ^ 3 = 8', () => {
+        expect(power(2, 3)).toBe(8);
+      });
+
+      it('should compute 2 ^ 8 = 256', () => {
+        expect(power(2, 8)).toBe(256);
+      });
+
+      it('should compute negative exponent', () => {
+        expect(power(2, -1)).toBe(0.5);
+      });
+
+      it('should compute zero exponent', () => {
+        expect(power(5, 0)).toBe(1);
+      });
+    });
+
+    describe('Square Root (sqrt)', () => {
+      it('should compute sqrt(16) = 4', () => {
+        expect(squareRoot(16)).toBe(4);
+      });
+
+      it('should compute sqrt(9) = 3', () => {
+        expect(squareRoot(9)).toBe(3);
+      });
+
+      it('should throw error for negative input', () => {
+        expect(() => squareRoot(-4)).toThrow('Cannot compute square root of negative number');
+      });
+    });
+
+    it('should verify image examples for extended operations', () => {
+      expect(modulo(5,2)).toBe(1);
+      expect(power(2,3)).toBe(8);
+      expect(squareRoot(16)).toBe(4);
     });
   });
 });
