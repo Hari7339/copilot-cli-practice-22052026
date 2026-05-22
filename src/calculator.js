@@ -8,12 +8,18 @@
  * - Subtraction (-)
  * - Multiplication (×)
  * - Division (÷)
+ * - Modulo (%)
+ * - Exponentiation / Power (^)
+ * - Square root (sqrt)
  * 
  * Usage:
  *   node calculator.js add 5 3          # Addition: 5 + 3 = 8
  *   node calculator.js subtract 10 2    # Subtraction: 10 - 2 = 8
  *   node calculator.js multiply 4 5     # Multiplication: 4 × 5 = 20
  *   node calculator.js divide 20 4      # Division: 20 ÷ 4 = 5
+ *   node calculator.js mod 10 3         # Modulo: 10 % 3 = 1
+ *   node calculator.js pow 2 8         # Power: 2 ^ 8 = 256
+ *   node calculator.js sqrt 9          # Square root: sqrt(9) = 3
  *   node calculator.js --help           # Show help message
  */
 
@@ -22,13 +28,16 @@ function showHelp() {
   console.log(`
 CLI Calculator - Basic Arithmetic Operations
 
-Usage: node calculator.js <operation> <number1> <number2>
+Usage: node calculator.js <operation> <number1> [number2]
 
 Operations:
   add                 Addition (num1 + num2)
   subtract            Subtraction (num1 - num2)
   multiply            Multiplication (num1 × num2)
   divide              Division (num1 ÷ num2)
+  mod                 Modulo (num1 % num2)
+  pow                 Exponentiation / Power (base ^ exponent)
+  sqrt                Square root (sqrt(n))
   --help              Display this help message
 
 Examples:
@@ -36,6 +45,9 @@ Examples:
   node calculator.js subtract 5 2         # Result: 3
   node calculator.js multiply 4 3         # Result: 12
   node calculator.js divide 10 2          # Result: 5
+  node calculator.js mod 10 3             # Result: 1
+  node calculator.js pow 2 8              # Result: 256
+  node calculator.js sqrt 9               # Result: 3
   `);
 }
 
@@ -62,12 +74,36 @@ function divide(num1, num2) {
   return num1 / num2;
 }
 
+// Modulo operation with zero-check
+function modulo(a, b) {
+  if (b === 0) {
+    throw new Error('Modulo by zero is not allowed');
+  }
+  return a % b;
+}
+
+// Exponentiation / power operation
+function power(base, exponent) {
+  return Math.pow(base, exponent);
+}
+
+// Square root with negative-number error handling
+function squareRoot(n) {
+  if (n < 0) {
+    throw new Error('Cannot compute square root of negative number');
+  }
+  return Math.sqrt(n);
+}
+
 // Export functions for testing
 module.exports = {
   add,
   subtract,
   multiply,
-  divide
+  divide,
+  modulo,
+  power,
+  squareRoot
 };
 
 // Main calculator logic
@@ -78,27 +114,35 @@ function calculator(args) {
     process.exit(0);
   }
 
-  const operation = args[0];
-  const num1 = parseFloat(args[1]);
-  const num2 = parseFloat(args[2]);
+  const operation = (args[0] || '').toLowerCase();
 
-  // Validate input arguments
-  if (args.length < 3) {
-    console.error('Error: Missing arguments. Expected <operation> <number1> <number2>');
+  // Require at least one numeric argument (some operations need two)
+  if (args.length < 2) {
+    console.error('Error: Missing arguments. Expected at least <operation> <number1>');
     console.error('Use --help for usage information');
     process.exit(1);
   }
 
+  const num1 = parseFloat(args[1]);
+  const num2 = args.length > 2 ? parseFloat(args[2]) : undefined;
+
   // Validate numeric inputs
-  if (isNaN(num1) || isNaN(num2)) {
-    console.error('Error: Invalid numeric input. Both arguments must be valid numbers');
-    process.exit(1);
+  if (operation === 'sqrt' || operation === 'sqr') {
+    if (isNaN(num1)) {
+      console.error('Error: Invalid numeric input. Argument must be a valid number');
+      process.exit(1);
+    }
+  } else {
+    if (isNaN(num1) || isNaN(num2)) {
+      console.error('Error: Invalid numeric input. Both arguments must be valid numbers');
+      process.exit(1);
+    }
   }
 
   let result;
 
   try {
-    switch (operation.toLowerCase()) {
+    switch (operation) {
       case 'add':
       case '+':
         result = add(num1, num2);
@@ -115,6 +159,20 @@ function calculator(args) {
       case 'divide':
       case '/':
         result = divide(num1, num2);
+        break;
+      case 'mod':
+      case '%':
+      case 'modulo':
+        result = modulo(num1, num2);
+        break;
+      case 'pow':
+      case '^':
+      case 'power':
+        result = power(num1, num2);
+        break;
+      case 'sqrt':
+      case 'sqr':
+        result = squareRoot(num1);
         break;
       default:
         console.error(`Error: Unknown operation '${operation}'`);
